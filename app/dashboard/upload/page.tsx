@@ -58,6 +58,12 @@ export default function SettingsPage() {
       return
     }
 
+    if (!currentUser) {
+      setError("No current user")
+      setIsLoading(false)
+      return
+    }
+
     const admin = getAdminByUsername(currentUser.username)
     if (!admin) {
       setError("Admin account not found")

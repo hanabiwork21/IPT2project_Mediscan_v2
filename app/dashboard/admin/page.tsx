@@ -37,18 +37,20 @@ export default function AdminManagementPage() {
   const [formData, setFormData] = useState({ username: "", password: "", role: "Doctor" as const })
   const [editFormData, setEditFormData] = useState({ username: "", role: "Doctor" as const })
   const [error, setError] = useState("")
-
-  const currentUser = getCurrentUser()
+  const [currentUser, setCurrentUser] = useState<any>(null)
 
   useEffect(() => {
+    const user = getCurrentUser()
+    setCurrentUser(user)
+
     // Check if user is admin
-    if (!currentUser || currentUser.role !== "Admin") {
+    if (!user || user.role !== "Admin") {
       router.push("/dashboard")
       return
     }
     // Load admins directly here instead of calling a function
     setAdmins(getAdmins())
-  }, []) // Empty dependency array - only run once on mount
+  }, [router]) // Empty dependency array - only run once on mount
 
   const handleAddAdmin = () => {
     setError("")

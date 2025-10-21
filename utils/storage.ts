@@ -1,5 +1,13 @@
 // localStorage utility functions for managing app data
 
+const isLocalStorageAvailable = (): boolean => {
+  try {
+    return typeof window !== "undefined" && typeof localStorage !== "undefined"
+  } catch {
+    return false
+  }
+}
+
 export interface Patient {
   id: string
   name: string
@@ -57,20 +65,26 @@ const verifyPassword = (password: string, hash: string): boolean => {
 
 // User Management
 export const setCurrentUser = (user: User): void => {
-  localStorage.setItem("currentUser", JSON.stringify(user))
+  if (isLocalStorageAvailable()) {
+    localStorage.setItem("currentUser", JSON.stringify(user))
+  }
 }
 
 export const getCurrentUser = (): User | null => {
+  if (!isLocalStorageAvailable()) return null
   const user = localStorage.getItem("currentUser")
   return user ? JSON.parse(user) : null
 }
 
 export const logout = (): void => {
-  localStorage.removeItem("currentUser")
+  if (isLocalStorageAvailable()) {
+    localStorage.removeItem("currentUser")
+  }
 }
 
 // Admin Management
 export const getAdmins = (): Admin[] => {
+  if (!isLocalStorageAvailable()) return []
   const admins = localStorage.getItem("admins")
   return admins ? JSON.parse(admins) : []
 }
@@ -86,7 +100,9 @@ export const addAdmin = (username: string, password: string, role: "Admin" | "Do
     createdBy,
   }
   admins.push(newAdmin)
-  localStorage.setItem("admins", JSON.stringify(admins))
+  if (isLocalStorageAvailable()) {
+    localStorage.setItem("admins", JSON.stringify(admins))
+  }
   return newAdmin
 }
 
@@ -112,7 +128,9 @@ export const updateAdmin = (id: string, updates: Partial<Omit<Admin, "id" | "cre
   }
 
   admins[index] = { ...admins[index], ...updates }
-  localStorage.setItem("admins", JSON.stringify(admins))
+  if (isLocalStorageAvailable()) {
+    localStorage.setItem("admins", JSON.stringify(admins))
+  }
   return admins[index]
 }
 
@@ -120,7 +138,9 @@ export const deleteAdmin = (id: string): boolean => {
   const admins = getAdmins()
   const filtered = admins.filter((a) => a.id !== id)
   if (filtered.length === admins.length) return false
-  localStorage.setItem("admins", JSON.stringify(filtered))
+  if (isLocalStorageAvailable()) {
+    localStorage.setItem("admins", JSON.stringify(filtered))
+  }
   return true
 }
 
@@ -135,6 +155,7 @@ export const changeAdminPassword = (id: string, oldPassword: string, newPassword
 
 // Patient Management
 export const getPatients = (): Patient[] => {
+  if (!isLocalStorageAvailable()) return []
   const patients = localStorage.getItem("patients")
   return patients ? JSON.parse(patients) : []
 }
@@ -147,7 +168,9 @@ export const addPatient = (patient: Omit<Patient, "id" | "createdAt">): Patient 
     createdAt: new Date().toISOString(),
   }
   patients.push(newPatient)
-  localStorage.setItem("patients", JSON.stringify(patients))
+  if (isLocalStorageAvailable()) {
+    localStorage.setItem("patients", JSON.stringify(patients))
+  }
   return newPatient
 }
 
@@ -162,12 +185,16 @@ export const updatePatient = (id: string, updates: Partial<Omit<Patient, "id" | 
   if (index === -1) return null
 
   patients[index] = { ...patients[index], ...updates }
-  localStorage.setItem("patients", JSON.stringify(patients))
+  if (isLocalStorageAvailable()) {
+    localStorage.setItem("patients", JSON.stringify(patients))
+  }
 
   if (updates.name) {
     const scans = getScans()
     const updatedScans = scans.map((scan) => (scan.patientId === id ? { ...scan, patientName: updates.name } : scan))
-    localStorage.setItem("scans", JSON.stringify(updatedScans))
+    if (isLocalStorageAvailable()) {
+      localStorage.setItem("scans", JSON.stringify(updatedScans))
+    }
   }
 
   return patients[index]
@@ -175,6 +202,7 @@ export const updatePatient = (id: string, updates: Partial<Omit<Patient, "id" | 
 
 // Scan Management
 export const getScans = (): Scan[] => {
+  if (!isLocalStorageAvailable()) return []
   const scans = localStorage.getItem("scans")
   return scans ? JSON.parse(scans) : []
 }
@@ -187,7 +215,9 @@ export const addScan = (scan: Omit<Scan, "id" | "uploadedAt">): Scan => {
     uploadedAt: new Date().toISOString(),
   }
   scans.push(newScan)
-  localStorage.setItem("scans", JSON.stringify(scans))
+  if (isLocalStorageAvailable()) {
+    localStorage.setItem("scans", JSON.stringify(scans))
+  }
   return newScan
 }
 
@@ -197,7 +227,9 @@ export const updateScan = (id: string, updates: Partial<Scan>): Scan | null => {
   if (index === -1) return null
 
   scans[index] = { ...scans[index], ...updates }
-  localStorage.setItem("scans", JSON.stringify(scans))
+  if (isLocalStorageAvailable()) {
+    localStorage.setItem("scans", JSON.stringify(scans))
+  }
   return scans[index]
 }
 
@@ -207,10 +239,12 @@ export const getScansByPatient = (patientId: string): Scan[] => {
 }
 
 export const resetAllData = (): void => {
-  localStorage.removeItem("patients")
-  localStorage.removeItem("scans")
-  localStorage.removeItem("admins")
-  localStorage.removeItem("currentUser")
+  if (isLocalStorageAvailable()) {
+    localStorage.removeItem("patients")
+    localStorage.removeItem("scans")
+    localStorage.removeItem("admins")
+    localStorage.removeItem("currentUser")
+  }
 
   // Reinitialize with default admin accounts
   addAdmin("admin", "admin123", "Admin", "System")

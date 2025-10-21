@@ -19,14 +19,15 @@ export default function SettingsPage() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-
-  const currentUser = getCurrentUser()
+  const [currentUser, setCurrentUser] = useState<any>(null)
 
   useEffect(() => {
-    if (!currentUser) {
+    const user = getCurrentUser()
+    setCurrentUser(user)
+    if (!user) {
       router.push("/login")
     }
-  }, [currentUser, router])
+  }, [router])
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault()

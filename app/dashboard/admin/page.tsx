@@ -34,8 +34,8 @@ export default function AdminManagementPage() {
   const [isResetOpen, setIsResetOpen] = useState(false)
   const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null)
   const [adminToDelete, setAdminToDelete] = useState<string | null>(null)
-  const [formData, setFormData] = useState({ username: "", password: "", role: "Doctor" as const })
-  const [editFormData, setEditFormData] = useState({ username: "", role: "Doctor" as const })
+  const [formData, setFormData] = useState<{ username: string; password: string; role: Admin['role'] }>({ username: "", password: "", role: "Doctor" })
+  const [editFormData, setEditFormData] = useState<{ username: string; role: Admin['role'] }>({ username: "", role: "Doctor" })
   const [error, setError] = useState("")
   const [currentUser, setCurrentUser] = useState<any>(null)
 
@@ -181,7 +181,7 @@ export default function AdminManagementPage() {
                   <select
                     id="new-role"
                     value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value as Admin['role'] })}
                     className="w-full rounded-md border border-input bg-background px-3 py-2"
                   >
                     <option value="Admin">Admin</option>
@@ -293,7 +293,7 @@ export default function AdminManagementPage() {
               <select
                 id="edit-role"
                 value={editFormData.role}
-                onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value as any })}
+                onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value as Admin['role'] })}
                 className="w-full rounded-md border border-input bg-background px-3 py-2"
               >
                 <option value="Admin">Admin</option>
